@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Permission, Group
 
 # Create your models here.
 
@@ -9,6 +9,12 @@ class BaseUser(AbstractUser):   # User base model for all users
     phone = models.CharField(max_length=11, unique=True)
     address = models.TextField(blank=True, null=True)
     date_joined = models.DateTimeField(auto_now_add=True)
+    
+    # Add related_name to avoid reverse accessor clashes
+    groups = models.ManyToManyField(Group, related_name="%(class)s_groups", blank=True)
+    user_permissions = models.ManyToManyField(Permission, related_name="%(class)s_permissions", blank=True)
+
+
     
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'phone']

@@ -16,7 +16,28 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.urls import include
+from django.http import HttpResponse
+
+
+
+# A simple homepage view
+def homepage(request):
+    return HttpResponse("<h1>Welcome to the Library Management System API</h1>")
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', homepage, name='homepage'),
 ]
+urlpatterns += [
+    path('Users/', include('Users.urls')),
+]
+
+#urlpatterns += [
+#    path('books/', include('books.urls')),
+#]
+
+#urlpatterns += [
+#    path('transactions/', include('transactions.urls')),
+#]
