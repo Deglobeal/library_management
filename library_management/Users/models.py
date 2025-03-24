@@ -49,7 +49,7 @@ class Student(BaseUser):  # Student model
         
 #  model for librarian
 
-class Libraraian( BaseUser):
+class Librarian( BaseUser):
     staff_id = models.CharField(max_length=10, unique=True)
     is_approved = models.BooleanField(default=False)
     
@@ -66,4 +66,4 @@ class Libraraian( BaseUser):
             verbose_name = 'Librarian'
             verbose_name_plural = 'Librarians'
             
-               
+            
