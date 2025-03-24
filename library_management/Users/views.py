@@ -19,3 +19,8 @@ class LibrarianViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
     
 
+
+
+
+def home_view(request):
+    return render(request, "general/home.html")
