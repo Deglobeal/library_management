@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
-    'library_api'
 ]
 
 MIDDLEWARE = [
@@ -78,8 +77,15 @@ WSGI_APPLICATION = 'library_management.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'alx_capstone',         # Database name
+        'USER': 'root',       # MySQL username
+        'PASSWORD': 'Dononye12@123',  # MySQL user password
+        'HOST': '127.0.0.1',          # Database host (use '127.0.0.1' if needed)
+        'PORT': '3306',               # MySQL port (default is 3306)
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",  # Prevent silent data truncation
+        }
     }
 }
 
