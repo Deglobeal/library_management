@@ -7,5 +7,20 @@
     <h1>Welcome to the Library Management System</h1>
     <p>Manage books, users, and transactions easily.</p>
     </div>
+
+    <h2>Login</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Login</button>
+    </form>
+
+    
+    {% if not user_authenticated %}
+        <a href="{% url 'login' %}"><button>Login</button></a>
+    {% else %}
+        <p>Welcome, {{ user.username }}!</p>
+        <a href="{% url 'logout' %}"><button>Logout</button></a>
+    {% endif %}
 {% endblock %}
 

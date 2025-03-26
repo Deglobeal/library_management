@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Registration{% endblock %}
+
+{% block content %}
+<div class="card mx-auto" style="max-width: 500px;">
+    <div class="card-header bg-danger text-white">
+        <h3>Admin Registration</h3>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <!-- Form fields remain the same -->
+            <button type="submit" class="btn btn-danger w-100 mt-3">Register</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

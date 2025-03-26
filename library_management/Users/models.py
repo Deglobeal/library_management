@@ -1,75 +1,48 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Permission, Group
 
-# Create your models here.
 
-class BaseUser(AbstractUser):   # User base model for all users
-    user_id = models.CharField(max_length=10, unique=True, editable=False)
+
+
+# Create your models here.
+# Replace abstract BaseUser with concrete User model
+class User(AbstractUser):
+    USER_TYPE_CHOICES = (
+        ('student', 'Student'),
+        ('librarian', 'Librarian'),
+        ('admin', 'Admin'),
+    )
+    
+    user_id = models.CharField(max_length=10, primary_key=True, unique=True, editable=False)
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=11, unique=True)
     address = models.TextField(blank=True, null=True)
     date_joined = models.DateTimeField(auto_now_add=True)
-    
-    # Add related_name to avoid reverse accessor clashes
-    groups = models.ManyToManyField(Group, related_name="%(class)s_groups", blank=True)
-    user_permissions = models.ManyToManyField(Permission, related_name="%(class)s_permissions", blank=True)
+    user_type = models.CharField(max_length=10, choices=USER_TYPE_CHOICES, default='student')
+    is_approved = models.BooleanField(default=False)
 
+    groups = models.ManyToManyField(Group, related_name="custom_user_groups", blank=True)
+    user_permissions = models.ManyToManyField(Permission, related_name="custom_user_permissions", blank=True)
 
-    
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'phone']
-    
-    class Meta:
-        abstract = True # not to create a table for this model
-        
+
     def save(self, *args, **kwargs):
         if not self.user_id:
-            self.user_id = self.generate_user_id() # generate user_id
-        
+            from uuid import uuid4
+            self.user_id = f"USR{uuid4().hex[:6].upper()}"
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"{self.username} - {self.email} - {self.user_id}"
-    
-    # student model will inherit this model and will have a user_id field
-    # user_id will be generated automatically when a student is created 
-class Student(BaseUser):  # Student model
+        return f"{self.email} ({self.user_type})"
+
+class Student(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, to_field='user_id')
     roll = models.CharField(max_length=10, unique=True)
     department = models.CharField(max_length=50)
     session = models.CharField(max_length=10)
-    
-    def __str__(self):
-        return f"{self.username} - {self.roll} - {self.department} - {self.session}"
-    
-    REQUIRED_FIELDS = BaseUser.REQUIRED_FIELDS + ['roll', 'department', 'session']
 
-# generate user_id for all users    
-    
-    def save(self, *args, **kwargs): # override save method
-        if not self.user_id: 
-            self.user_id = self.generate_user_id() # generate user_id
-        super().save(*args, **kwargs) #
-        
-    class Meta:
-        verbose_name = 'Student'
-        verbose_name_plural = 'Students'
-    
-        
-#  model for librarian
-
-class Librarian( BaseUser):
+class Librarian(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, to_field='user_id')
     staff_id = models.CharField(max_length=10, unique=True)
     is_approved = models.BooleanField(default=False)
-    
-    
-    def save(self,  *args, **kwargs):
-        if not self.staff_id:
-            self.staff_id = self.generate_staff_id()
-        super().save(*args, **kwargs)
-        
-        def generate_staff_id(self):
-            # Implement your logic to generate a unique staff ID
-            return f"STF{self.pk:05d}" # generate staff_id
-        class Meta:
-            verbose_name = 'Librarian'
-            verbose_name_plural = 'Librarians'
-            
-            

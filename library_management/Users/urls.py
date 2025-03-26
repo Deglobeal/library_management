@@ -1,8 +1,18 @@
-from django.urls import include, path
-from . import views
-from .views import StudentView, LibrarianViewSet
-from rest_framework.routers import DefaultRouter
-
+from django.urls import path
+from django.contrib.auth.views import LoginView, LogoutView
+from django.views.generic import TemplateView
+from django.contrib.auth.decorators import login_required
+from .views import (
+    StudentView, 
+    LibrarianViewSet,
+    StudentRegistrationView,
+    LibrarianRegistrationView,
+    CustomLoginView,  
+    AdminRegistrationView, 
+    home_view,
+    student_home,
+    librarian_home
+)
 urlpatterns = [
     # Student Endpoints
     path('students/', StudentView.as_view({'get': 'list', 'post': 'create'}), name='student-list'),
@@ -11,4 +21,19 @@ urlpatterns = [
     # Librarian Endpoints
     path('librarians/', LibrarianViewSet.as_view({'get': 'list', 'post': 'create'}), name='librarian-list'),
     path('librarians/<int:pk>/', LibrarianViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='librarian-detail'),
+    
+    path('login/', LoginView.as_view(template_name='auth/login.html',redirect_authenticated_user=True
+), name='login'),
+    path('login/', CustomLoginView.as_view(template_name='auth/login.html'), name='login'),
+    path('logout/', LogoutView.as_view(), name='logout'),
+    
+    # Registration URLspath('register/', TemplateView.as_view(template_name='auth/choice.html'), name='register-choice'),
+    path('register/student/', StudentRegistrationView.as_view(), name='student-register'),
+    path('register/librarian/', LibrarianRegistrationView.as_view(), name='librarian-register'),
+    path('register/admin/', login_required(AdminRegistrationView.as_view()), name='admin-register'),
+    
+    path('', home_view, name='home'),
+    path('student-home/', student_home, name='student-home'),
+    path('librarian-home/', librarian_home, name='librarian-home'), # type: ignore
+
 ]
