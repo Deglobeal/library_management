@@ -5,8 +5,11 @@ class IsApprovedLibrarian(permissions.BasePermission):
     """Allows access only to approved librarians."""
     
     def has_permission(self, request, view):
-        return request.user.is_authenticated and hasattr(request.user, "librarian") and request.user.librarian.is_approved
-
+        return (
+            request.user.is_authenticated and 
+            hasattr(request.user, "librarian") and 
+            request.user.librarian.is_approved
+        )
 
 class IsAdminOrSelf(permissions.BasePermission):
     """

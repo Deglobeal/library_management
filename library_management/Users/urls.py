@@ -22,18 +22,17 @@ urlpatterns = [
     path('librarians/', LibrarianViewSet.as_view({'get': 'list', 'post': 'create'}), name='librarian-list'),
     path('librarians/<int:pk>/', LibrarianViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='librarian-detail'),
     
-    path('login/', LoginView.as_view(template_name='auth/login.html',redirect_authenticated_user=True
-), name='login'),
+    # Use only the custom login view
     path('login/', CustomLoginView.as_view(template_name='auth/login.html'), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
     
-    # Registration URLspath('register/', TemplateView.as_view(template_name='auth/choice.html'), name='register-choice'),
+    # Registration URLs
+    path('register/', TemplateView.as_view(template_name='auth/choice.html'), name='register-choice'),
     path('register/student/', StudentRegistrationView.as_view(), name='student-register'),
     path('register/librarian/', LibrarianRegistrationView.as_view(), name='librarian-register'),
     path('register/admin/', login_required(AdminRegistrationView.as_view()), name='admin-register'),
     
     path('', home_view, name='home'),
     path('student-home/', student_home, name='student-home'),
-    path('librarian-home/', librarian_home, name='librarian-home'), # type: ignore
-
+    path('librarian-home/', librarian_home, name='librarian-home'),
 ]

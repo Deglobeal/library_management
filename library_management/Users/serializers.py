@@ -33,19 +33,20 @@ class LibrarianSerializer(serializers.ModelSerializer):
     class Meta:
         model = Librarian
         fields = ['email', 'username', 'password', 'phone']
-
-    def create(self, validated_data):
-        user = Librarian.objects.create_user(
-            email=validated_data['email'],
-            username=validated_data['username'],
-            password=validated_data['password'],
-            phone=validated_data['phone'],
-            staff_id=validated_data.get('staff_id', 'TEMP_ID')  # Adjust as needed
-        )
+        read_only_fields = ['is_approved']
         
+        
+    def create(self, validated_data):
+        user_data = {
+            'email': validated_data['email'],
+            'username': validated_data['username'],
+            'phone': validated_data['phone'],
+            'password': validated_data['password'],
+            'user_type': 'librarian',
+        }
+        user = User.objects.create_user(**user_data)
         user.set_password(validated_data['password'])
         user.save()
-        return user
     
 # Admin serializer
 # This is the serializer for the Admin model. It is used to serialize the data of the Admin model for API responses.

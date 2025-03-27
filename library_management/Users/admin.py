@@ -31,7 +31,12 @@ class StudentAdmin(admin.ModelAdmin):
 class LibrarianAdmin(admin.ModelAdmin):
     list_display = ('user', 'staff_id', 'is_approved')
     list_filter = ('is_approved',)
-    raw_id_fields = ('user',)
+    action = ['approve_librarians']
+    
+    
+    def approve_librarians(self, request, queryset):
+        queryset.update(is_approved=True)
+    approve_librarians.short_description = 'Approve selected librarians'
 
 
 

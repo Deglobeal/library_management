@@ -3,11 +3,12 @@ from django.contrib.auth.views import LoginView as AuthLoginView
 from rest_framework import viewsets, permissions, status
 from .models import Student, Librarian
 from rest_framework.parsers import FormParser, MultiPartParser
-from rest_framework.permissions import AllowAny, IsAdminUser
+from rest_framework.permissions import AllowAny, IsAdminUser 
 from .serializers import StudentSerializer, LibrarianSerializer, AdminSerializer
 from rest_framework.response import Response
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.views import APIView
+from .permissions import IsApprovedLibrarian
 
 # Create your views here.
 
@@ -21,9 +22,9 @@ class StudentView(viewsets.ModelViewSet):
     
 # viewset for librarian
 class LibrarianViewSet(viewsets.ModelViewSet):
-    queryset = Librarian.objects.all()
+    queryset =Librarian.objects.filter(is_approved=True)
     serializer_class = LibrarianSerializer
-    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+    permission_classes = [permissions.IsAuthenticated, IsApprovedLibrarian] # type: ignore
 
 # registration choice view for user
 class RegistrationChoiceView(APIView):
@@ -51,7 +52,7 @@ class StudentRegistrationView(APIView):
         )
 # librarian registration view
 class LibrarianRegistrationView(APIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = [AllowAny]
     parser_classes = [FormParser, MultiPartParser]
     renderer_classes = [TemplateHTMLRenderer]
     template_name = 'auth/librarian_register.html'
@@ -62,7 +63,7 @@ class LibrarianRegistrationView(APIView):
     def post(self, request):
         serializer = LibrarianSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            librarian = serializer.save()
             return redirect('login')
         return Response(
             {'errors': serializer.errors},
