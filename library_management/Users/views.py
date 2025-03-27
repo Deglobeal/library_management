@@ -19,6 +19,11 @@ class StudentView(viewsets.ModelViewSet):
     serializer_class = StudentSerializer 
     permission_classes = [permissions.IsAuthenticated]
     
+    def get_queryset(self):
+        # Students see only their data; librarians/admins see all
+        if self.request.user.is_staff or self.request.user.is_superuser:
+            return Student.objects.all()
+        return Student.objects.filter(user=self.request.user)
     
 # viewset for librarian
 class LibrarianViewSet(viewsets.ModelViewSet):
@@ -26,6 +31,11 @@ class LibrarianViewSet(viewsets.ModelViewSet):
     serializer_class = LibrarianSerializer
     permission_classes = [permissions.IsAuthenticated, IsApprovedLibrarian] # type: ignore
 
+    def get_queryset(self):
+        if self.request.user.is_staff or self.request.user.is_superuser:
+            return Librarian.objects.all()
+        return Librarian.objects.filter(user=self.request.user, is_approved=True)
+    
 # registration choice view for user
 class RegistrationChoiceView(APIView):
     def get(self, request):

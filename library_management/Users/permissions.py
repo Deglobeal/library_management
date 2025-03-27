@@ -19,9 +19,16 @@ class IsAdminOrSelf(permissions.BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
-        # Allow access if user is an admin
+        # Admins have full access
         if request.user.is_staff or request.user.is_superuser:
             return True
 
-        # Allow students to access their own record
-        return obj.id == request.user.id
+        # Students: Check if obj is their linked Student
+        if hasattr(request.user, 'student'):
+            return obj.user == request.user
+
+        # Librarians: Check if obj is their linked Librarian
+        if hasattr(request.user, 'librarian'):
+            return obj.user == request.user
+
+        return False

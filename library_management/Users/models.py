@@ -44,4 +44,4 @@ class Librarian(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, to_field='user_id')
     staff_id = models.CharField(max_length=10, unique=True)
     is_approved = models.BooleanField(default=False)
-    is_librarian = models.BooleanField(default=False)
+    
