@@ -32,6 +32,8 @@ urlpatterns = [
     
     
     path('', home_view, name='home'),
-    path('student-home/', student_home, name='student-home'),
+    
     path('librarian-home/', librarian_home, name='librarian-home'),
-]
+    path('student-home/', student_home, name='student-home'),
+    
+    ]

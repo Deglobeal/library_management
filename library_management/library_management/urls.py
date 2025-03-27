@@ -22,15 +22,6 @@ from Users.views import home_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', home_view, name='home'),]
-urlpatterns += [
+    path('', home_view, name='home'),
     path('Users/', include('Users.urls')),
 ]
-
-#urlpatterns += [
-#    path('books/', include('books.urls')),
-#]
-
-#urlpatterns += [
-#    path('transactions/', include('transactions.urls')),
-#]

@@ -1,7 +1,5 @@
 {% extends 'base.html' %}
 
-{% block title %}Student Registration{% endblock %}
-
 {% block content %}
 <div class="card mx-auto" style="max-width: 500px;">
     <div class="card-header bg-primary text-white">
@@ -10,7 +8,81 @@
     <div class="card-body">
         <form method="post">
             {% csrf_token %}
-            <!-- Form fields remain the same -->
+            
+            <!-- User Fields -->
+            <h5>Account Information</h5>
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" name="user.email" class="form-control {% if form_submitted and serializer.user.errors.email %}is-invalid{% endif %}">
+                {% if form_submitted %}
+                    <div class="invalid-feedback">
+                        {{ serializer.user.errors.email|striptags }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                <input type="text" name="user.username" class="form-control {% if form_submitted and serializer.user.errors.username %}is-invalid{% endif %}">
+                {% if form_submitted %}
+                    <div class="invalid-feedback">
+                        {{ serializer.user.errors.username|striptags }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input type="password" name="user.password" class="form-control {% if form_submitted and serializer.user.errors.password %}is-invalid{% endif %}">
+                {% if form_submitted %}
+                    <div class="invalid-feedback">
+                        {{ serializer.user.errors.password|striptags }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Phone</label>
+                <input type="text" name="user.phone" class="form-control {% if form_submitted and serializer.user.errors.phone %}is-invalid{% endif %}">
+                {% if form_submitted %}
+                    <div class="invalid-feedback">
+                        {{ serializer.user.errors.phone|striptags }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Student Fields -->
+            <h5 class="mt-4">Student Information</h5>
+            <div class="mb-3">
+                <label class="form-label">Roll Number</label>
+                <input type="text" name="roll" class="form-control {% if form_submitted and serializer.errors.roll %}is-invalid{% endif %}">
+                {% if form_submitted %}
+                    <div class="invalid-feedback">
+                        {{ serializer.errors.roll|striptags }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Department</label>
+                <input type="text" name="department" class="form-control {% if form_submitted and serializer.errors.department %}is-invalid{% endif %}">
+                {% if form_submitted %}
+                    <div class="invalid-feedback">
+                        {{ serializer.errors.department|striptags }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Session</label>
+                <input type="text" name="session" class="form-control {% if form_submitted and serializer.errors.session %}is-invalid{% endif %}">
+                {% if form_submitted %}
+                    <div class="invalid-feedback">
+                        {{ serializer.errors.session|striptags }}
+                    </div>
+                {% endif %}
+            </div>
+
             <button type="submit" class="btn btn-primary w-100 mt-3">Register</button>
         </form>
     </div>

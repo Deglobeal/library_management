@@ -8,82 +8,77 @@ from .serializers import StudentSerializer, LibrarianSerializer
 from rest_framework.response import Response
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.views import APIView
-from .permissions import IsApprovedLibrarian
+from .permissions import IsApprovedLibrarian, IsAdminOrSelf
 
-# Create your views here.
-
-
-# viewset for student
+# Viewset for Student
 class StudentView(viewsets.ModelViewSet): 
-    queryset = Student.objects.all() 
     serializer_class = StudentSerializer 
-    permission_classes = [permissions.IsAuthenticated]
-    
+    permission_classes = [permissions.IsAuthenticated, IsAdminOrSelf]
+
     def get_queryset(self):
-        # Students see only their data; librarians/admins see all
         if self.request.user.is_staff or self.request.user.is_superuser:
             return Student.objects.all()
         return Student.objects.filter(user=self.request.user)
-    
-# viewset for librarian
+
+# Viewset for Librarian
 class LibrarianViewSet(viewsets.ModelViewSet):
-    queryset =Librarian.objects.filter(is_approved=True)
     serializer_class = LibrarianSerializer
-    permission_classes = [permissions.IsAuthenticated, IsApprovedLibrarian] # type: ignore
+    permission_classes = [permissions.IsAuthenticated, IsApprovedLibrarian]
 
     def get_queryset(self):
         if self.request.user.is_staff or self.request.user.is_superuser:
             return Librarian.objects.all()
         return Librarian.objects.filter(user=self.request.user, is_approved=True)
-    
-# registration choice view for user
+
+# Registration Views
 class RegistrationChoiceView(APIView):
     def get(self, request):
         return render(request, 'auth/choice.html')
-    
-# student registration view
+
 class StudentRegistrationView(APIView):
     permission_classes = [AllowAny]
-    parser_classes = [FormParser, MultiPartParser]
     renderer_classes = [TemplateHTMLRenderer]
     template_name = 'auth/student_register.html'
 
     def get(self, request):
-        return Response(template_name=self.template_name)
+        serializer = StudentSerializer()
+        return Response({
+            'serializer': serializer,
+            'form_submitted': False
+        })
 
     def post(self, request):
         serializer = StudentSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return redirect('login')
-        return Response(
-            {'errors': serializer.errors},
-            template_name=self.template_name
-        )
-# librarian registration view
+            
+        return Response({
+            'serializer': serializer,
+            'form_submitted': True
+        }, template_name=self.template_name, status=status.HTTP_400_BAD_REQUEST)
 class LibrarianRegistrationView(APIView):
     permission_classes = [AllowAny]
-    parser_classes = [FormParser, MultiPartParser]
     renderer_classes = [TemplateHTMLRenderer]
     template_name = 'auth/librarian_register.html'
 
     def get(self, request):
-        return Response(template_name=self.template_name)
+        serializer = LibrarianSerializer()
+        return Response({
+            'serializer': serializer,
+            'form_submitted': False})
 
     def post(self, request):
         serializer = LibrarianSerializer(data=request.data)
         if serializer.is_valid():
-            librarian = serializer.save()
+            serializer.save()
             return redirect('login')
-        return Response(
-            {'errors': serializer.errors},
-            template_name=self.template_name
-        )
-# admin registration view
+        return Response({
+            'serializer': serializer,
+            'form_submitted': True
+        }, template_name=self.template_name, status=status.HTTP_400_BAD_REQUEST)
 
-
-# home view for each type of user
-
+# Home Views
 def home_view(request):
     if request.user.is_authenticated:
         if request.user.is_superuser:
@@ -100,15 +95,14 @@ def student_home(request):
 def librarian_home(request):
     return render(request, 'general/librarian_home.html')
 
-
-# to handle login 
+# Custom Login View
 class CustomLoginView(AuthLoginView):
     def get_success_url(self):
         user = self.request.user
-        if self.request.user.is_superuser:
+        if user.is_superuser:
             return '/admin/'
-        elif hasattr(self.request.user, 'student'):
-            return '/student-home'
-        elif hasattr(self.request.user, 'librarian'):
-            return '/librarian-home'
+        elif hasattr(user, 'student'):
+            return 'student-home'
+        elif hasattr(user, 'librarian'):
+            return 'librarian-home'
         return super().get_success_url()
