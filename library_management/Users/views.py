@@ -4,7 +4,7 @@ from rest_framework import viewsets, permissions, status
 from .models import Student, Librarian
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import AllowAny, IsAdminUser 
-from .serializers import StudentSerializer, LibrarianSerializer, AdminSerializer
+from .serializers import StudentSerializer, LibrarianSerializer 
 from rest_framework.response import Response
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.views import APIView
@@ -70,24 +70,7 @@ class LibrarianRegistrationView(APIView):
             template_name=self.template_name
         )
 # admin registration view
-class AdminRegistrationView(APIView):
-    permission_classes = [IsAdminUser]
-    parser_classes = [FormParser, MultiPartParser]
-    renderer_classes = [TemplateHTMLRenderer]
-    template_name = 'auth/admin_register.html'
 
-    def get(self, request):
-        return render(request, self.template_name)
-
-    def post(self, request):
-        serializer = AdminSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return redirect('login')
-        return Response(
-            {'errors': serializer.errors},
-            template_name=self.template_name
-        )
 
 # home view for each type of user
 

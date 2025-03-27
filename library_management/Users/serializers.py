@@ -50,19 +50,3 @@ class LibrarianSerializer(serializers.ModelSerializer):
     
 # Admin serializer
 # This is the serializer for the Admin model. It is used to serialize the data of the Admin model for API responses.
-class AdminSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
-
-    class Meta:
-        model = User
-        fields = ['email', 'username', 'password', 'phone']
-
-    def create(self, validated_data):
-        user = User.objects.create_superuser(
-            email=validated_data['email'],
-            username=validated_data['username'],
-            password=validated_data['password'],
-            phone=validated_data['phone'],
-            user_type='admin'
-        )
-        return user

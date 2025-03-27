@@ -8,7 +8,6 @@ from .views import (
     StudentRegistrationView,
     LibrarianRegistrationView,
     CustomLoginView,  
-    AdminRegistrationView, 
     home_view,
     student_home,
     librarian_home
@@ -30,7 +29,7 @@ urlpatterns = [
     path('register/', TemplateView.as_view(template_name='auth/choice.html'), name='register-choice'),
     path('register/student/', StudentRegistrationView.as_view(), name='student-register'),
     path('register/librarian/', LibrarianRegistrationView.as_view(), name='librarian-register'),
-    path('register/admin/', login_required(AdminRegistrationView.as_view()), name='admin-register'),
+    
     
     path('', home_view, name='home'),
     path('student-home/', student_home, name='student-home'),
