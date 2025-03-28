@@ -32,3 +32,22 @@ class IsAdminOrSelf(permissions.BasePermission):
             return obj.user == request.user
 
         return False
+    
+    
+    
+    
+    
+
+
+
+
+# users/permissions.py
+class IsAdminOrApprovedLibrarianOrReadOnly(BasePermission):
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return request.user.is_authenticated
+        return (
+            request.user.is_authenticated and 
+            (request.user.is_staff or 
+            (hasattr(request.user, 'librarian') and request.user.librarian.is_approved))
+        )
