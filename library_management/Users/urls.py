@@ -23,7 +23,7 @@ urlpatterns = [
     
     # Use only the custom login view
     path('login/', CustomLoginView.as_view(template_name='auth/login.html'), name='login'),
-    path('logout/', LogoutView.as_view(), name='logout'),
+    path('logout/', LogoutView.as_view(next_page='home'), name='logout'),
     
     # Registration URLs
     path('register/', TemplateView.as_view(template_name='auth/choice.html'), name='register-choice'),
@@ -32,7 +32,6 @@ urlpatterns = [
     
     
     path('', home_view, name='home'),
-    
     path('librarian-home/', librarian_home, name='librarian-home'),
     path('student-home/', student_home, name='student-home'),
     

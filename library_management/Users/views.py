@@ -2,11 +2,11 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.views import LoginView as AuthLoginView
 from rest_framework import viewsets, permissions, status
 from .models import Student, Librarian
-from rest_framework.parsers import FormParser, MultiPartParser
-from rest_framework.permissions import AllowAny, IsAdminUser 
+from rest_framework.permissions import AllowAny 
 from .serializers import StudentSerializer, LibrarianSerializer 
 from rest_framework.response import Response
 from rest_framework.renderers import TemplateHTMLRenderer
+from django.urls import reverse
 from rest_framework.views import APIView
 from .permissions import IsApprovedLibrarian, IsAdminOrSelf
 
@@ -96,13 +96,14 @@ def librarian_home(request):
     return render(request, 'general/librarian_home.html')
 
 # Custom Login View
+
 class CustomLoginView(AuthLoginView):
     def get_success_url(self):
         user = self.request.user
         if user.is_superuser:
-            return '/admin/'
+            return reverse('admin:index')
         elif hasattr(user, 'student'):
-            return 'student-home'
+            return reverse('student-home')
         elif hasattr(user, 'librarian'):
-            return 'librarian-home'
+            return reverse('librarian-home')
         return super().get_success_url()
