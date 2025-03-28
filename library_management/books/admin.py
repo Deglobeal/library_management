@@ -7,8 +7,8 @@ class BookAdmin(admin.ModelAdmin):
     search_fields = ('title', 'author', 'isbn')
     
     
-    def picture_preview(self, ojj):
-        return ojj.picture and f'<img src="{obj.picture.url}"  style="width: 50px; height: 50px;" />' or 'No Image'
+    def picture_preview(self, obj):
+        return obj.picture and f'<img src="{obj.picture.url}"  style="width: 50px; height: 50px;" />' or 'No Image'
     
     picture_preview.short_description = 'Cover Preview'
     picture_preview.allow_tags = True

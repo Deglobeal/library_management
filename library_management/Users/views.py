@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.views import LoginView as AuthLoginView
 from rest_framework import viewsets, permissions, status
+from books.models import Book 
 from .models import Student, Librarian
 from rest_framework.permissions import AllowAny 
 from .serializers import StudentSerializer, LibrarianSerializer 
@@ -80,6 +81,12 @@ class LibrarianRegistrationView(APIView):
 
 # Home Views
 def home_view(request):
+    available_books = Book.objects.filter(copies_available__gt=0)
+    context = {
+        'books': available_books,
+        'title': 'Available Books'
+    }
+    
     if request.user.is_authenticated:
         if request.user.is_superuser:
             return redirect('admin:index')
@@ -87,7 +94,8 @@ def home_view(request):
             return redirect('student-home')
         elif hasattr(request.user, 'librarian'):
             return redirect('librarian-home')
-    return render(request, 'general/home.html')
+    return render(request, 'general/home.html', context)
+
 
 def student_home(request):
     return render(request, 'general/student_home.html')
