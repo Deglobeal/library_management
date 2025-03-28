@@ -9,6 +9,12 @@ class Book(models.Model):
     publication_date = models.DateField()
     isbn = models.CharField(max_length=13, unique=True)
     copies_available = models.IntegerField(default=0)
+    picture = models.ImageField(
+        upload_to='book_covers/',
+        null=True,
+        blank=True,
+        default='book_covers/default.jpg'
+    )
 
     def __str__(self):
         return self.title

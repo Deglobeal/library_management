@@ -19,6 +19,8 @@ from django.urls import path
 from django.urls import include
 from Users.views import home_view, librarian_home
 from django.contrib.auth.views import LogoutView
+from django.conf.urls.static import static
+from django.conf import settings
 
 
 urlpatterns = [
@@ -38,3 +40,7 @@ urlpatterns = [
     path('librarian-home/', librarian_home, name='librarian_home'), 
     path('admin/logout/', LogoutView.as_view(next_page='home'), name='admin_logout'),
 ]
+
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
