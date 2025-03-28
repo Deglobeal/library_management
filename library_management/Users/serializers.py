@@ -51,16 +51,18 @@ class LibrarianSerializer(serializers.ModelSerializer):
         fields = ['user', 'staff_id']
         read_only_fields = ['is_approved']
 
+    class Meta:
+        model = Librarian
+        fields = ['user', 'staff_id']
+        read_only_fields = ['is_approved']
+
     def create(self, validated_data):
         user_data = validated_data.pop('user')
-        user = User.objects.create_user(
-            email=user_data['email'],
-            username=user_data['username'],
-            password=user_data['password'],
-            phone=user_data['phone'],
-            user_type='librarian'  # This sets the user_type correctly
-        )
-        return Librarian.objects.create(
-            user=user,
-            staff_id=validated_data['staff_id']
-        )
+        user_serializer = UserRegistrationSerializer(data=user_data, context={'user_type': 'librarian'})  # Fix: Use context
+        if user_serializer.is_valid():
+            user = user_serializer.save()  # Fix: Use serializer to create user
+            return Librarian.objects.create(
+                user=user,
+                staff_id=validated_data['staff_id']
+            )
+        raise serializers.ValidationError(user_serializer.errors)  # Propagate errors

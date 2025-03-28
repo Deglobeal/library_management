@@ -15,9 +15,11 @@
                 <label class="form-label">Email</label>
                 <input type="email" name="user.email" class="form-control {% if form_submitted and serializer.user.errors.email %}is-invalid{% endif %}">
                 {% if form_submitted %}
-                    <div class="invalid-feedback">
-                        {{ serializer.user.errors.email|striptags }}
-                    </div>
+                    {% for field in serializer.errors %}
+                        {% for error in field.errors %}
+                            <div class="alert alert-danger">{{ error }}</div>
+                        {% endfor %}
+                    {% endfor %}
                 {% endif %}
             </div>
 
@@ -25,9 +27,11 @@
                 <label class="form-label">Username</label>
                 <input type="text" name="user.username" class="form-control {% if form_submitted and serializer.user.errors.username %}is-invalid{% endif %}">
                 {% if form_submitted %}
-                    <div class="invalid-feedback">
-                        {{ serializer.user.errors.username|striptags }}
-                    </div>
+                    {% for field in serializer.errors %}
+                        {% for error in field.errors %}
+                            <div class="alert alert-danger">{{ error }}</div>
+                        {% endfor %}
+                    {% endfor %}
                 {% endif %}
             </div>
 
@@ -35,9 +39,11 @@
                 <label class="form-label">Password</label>
                 <input type="password" name="user.password" class="form-control {% if form_submitted and serializer.user.errors.password %}is-invalid{% endif %}">
                 {% if form_submitted %}
-                    <div class="invalid-feedback">
-                        {{ serializer.user.errors.password|striptags }}
-                    </div>
+                    {% for field in serializer.errors %}
+                        {% for error in field.errors %}
+                            <div class="alert alert-danger">{{ error }}</div>
+                        {% endfor %}
+                    {% endfor %}
                 {% endif %}
             </div>
 
@@ -45,9 +51,11 @@
                 <label class="form-label">Phone</label>
                 <input type="text" name="user.phone" class="form-control {% if form_submitted and serializer.user.errors.phone %}is-invalid{% endif %}">
                 {% if form_submitted %}
-                    <div class="invalid-feedback">
-                        {{ serializer.user.errors.phone|striptags }}
-                    </div>
+                    {% for field in serializer.errors %}
+                        {% for error in field.errors %}
+                            <div class="alert alert-danger">{{ error }}</div>
+                        {% endfor %}
+                    {% endfor %}
                 {% endif %}
             </div>
 
@@ -57,9 +65,11 @@
                 <label class="form-label">Staff ID</label>
                 <input type="text" name="staff_id" class="form-control {% if form_submitted and serializer.errors.staff_id %}is-invalid{% endif %}">
                 {% if form_submitted %}
-                    <div class="invalid-feedback">
-                        {{ serializer.errors.staff_id|striptags }}
-                    </div>
+                    {% for field in serializer.errors %}
+                        {% for error in field.errors %}
+                            <div class="alert alert-danger">{{ error }}</div>
+                        {% endfor %}
+                    {% endfor %}
                 {% endif %}
             </div>
 
