@@ -6,10 +6,11 @@ from .models import User, Student, Librarian
 class UserAdmin(admin.ModelAdmin):
     list_display = ('user_id', 'email', 'user_type', 'is_staff', 'get_is_approved')
     list_filter = ('user_type', 'is_staff')
+    readonly_fields = ('user_id', 'date_joined')
     fieldsets = (
         (None, {'fields': ('user_id', 'username', 'password')}),
         ('Personal Info', {'fields': ('email', 'phone', 'address')}),
-        ('Permissions', {'fields': ('is_approved', 'is_staff', 'is_superuser', 'user_type')}),
+        ('Permissions', {'fields': ('is_staff', 'is_superuser', 'user_type')}),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
     
@@ -30,6 +31,7 @@ class StudentAdmin(admin.ModelAdmin):
 class LibrarianAdmin(admin.ModelAdmin):
     list_display = ('user', 'staff_id', 'is_approved')
     list_filter = ('is_approved',)
+    list_editable = ('is_approved',)
     actions = ['approve_librarians']  
     
     
