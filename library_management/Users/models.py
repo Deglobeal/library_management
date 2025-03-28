@@ -1,12 +1,19 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser, Permission, Group
+from django.contrib.auth.models import AbstractUser, Permission, Group, BaseUserManager
 
 
-
+class UserManager(BaseUserManager):
+    def create_user(self, email, username, password, **extra_fields):
+        # Add logic to handle custom fields (e.g., user_id)
+        user = self.model(email=email, username=username, **extra_fields)
+        user.set_password(password)
+        user.save()
+        return user
 
 # Create your models here.
 # Replace abstract BaseUser with concrete User model
 class User(AbstractUser):
+    objects = UserManager()
     USER_TYPE_CHOICES = (
         ('student', 'Student'),
         ('librarian', 'Librarian'),
@@ -18,7 +25,6 @@ class User(AbstractUser):
     address = models.TextField(blank=True, null=True)
     date_joined = models.DateTimeField(auto_now_add=True)
     user_type = models.CharField(max_length=10, choices=USER_TYPE_CHOICES, default='student')
-    is_approved = models.BooleanField(default=False)
 
     groups = models.ManyToManyField(Group, related_name="custom_user_groups", blank=True)
     user_permissions = models.ManyToManyField(Permission, related_name="custom_user_permissions", blank=True)

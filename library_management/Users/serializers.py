@@ -20,6 +20,16 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             user_type=self.context.get('user_type', 'student')
         )
         return user
+    
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Email already exists.")
+        return value
+    
+    def validate_phone(self, value):
+        if User.objects.filter(phone=value).exists():
+            raise serializers.ValidationError("Phone number already exists.")
+        return value
 
 class StudentSerializer(serializers.ModelSerializer):
     user = UserRegistrationSerializer()
@@ -45,11 +55,6 @@ class StudentSerializer(serializers.ModelSerializer):
 class LibrarianSerializer(serializers.ModelSerializer):
     user = UserRegistrationSerializer()
     staff_id = serializers.CharField()
-
-    class Meta:
-        model = Librarian
-        fields = ['user', 'staff_id']
-        read_only_fields = ['is_approved']
 
     class Meta:
         model = Librarian

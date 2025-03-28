@@ -107,3 +107,11 @@ class CustomLoginView(AuthLoginView):
         elif hasattr(user, 'librarian'):
             return reverse('librarian-home')
         return super().get_success_url()
+    
+    
+    def form_valid(self, form):
+        user = form.get_user()
+        if hasattr(user, 'librarian') and not user.librarian.is_approved:
+            form.add_error(None, "Your account is pending approval.")
+            return self.form_invalid(form)
+        return super().form_valid(form)

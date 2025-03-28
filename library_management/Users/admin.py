@@ -4,9 +4,24 @@ from .models import User, Student, Librarian
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('user_id', 'email', 'user_type', 'is_approved', 'is_staff')
-    list_filter = ('user_type', 'is_approved', 'is_staff')
+    list_display = ('user_id', 'email', 'user_type', 'is_staff', 'get_is_approved')
+    list_filter = ('user_type', 'is_staff')
+    fieldsets = (
+        (None, {'fields': ('user_id', 'username', 'password')}),
+        ('Personal Info', {'fields': ('email', 'phone', 'address')}),
+        ('Permissions', {'fields': ('is_approved', 'is_staff', 'is_superuser', 'user_type')}),
+        ('Important dates', {'fields': ('last_login', 'date_joined')}),
+    )
+    
+    def get_is_approved(self, obj):
+        if hasattr(obj, 'librarian'):
+            return obj.librarian.is_approved
+        return "N/A"  # Return "N/A" for non-librarians
 
+    get_is_approved.short_description = "Approved"
+    get_is_approved.admin_order_field = "librarian__is_approved"
+    
+    
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
     list_display = ('user', 'roll', 'department')
