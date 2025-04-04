@@ -19,7 +19,7 @@ class Book(models.Model):
     added_by = models.ForeignKey(
         User, on_delete=models.SET_NULL,
         null=True,
-        limi_choice_to = {'user_type': 'librarian'},
+        limit_choices_to = {'user_type': 'librarian'},
         related_name='added_books')
     
     date_added = models.DateTimeField(auto_now_add=True)
