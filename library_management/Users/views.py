@@ -2,12 +2,13 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.views import LoginView as AuthLoginView
 from rest_framework import viewsets, permissions, status
 from books.models import Book 
-from .models import Student, Librarian
+from .models import Student, Librarian, Transaction
 from rest_framework.permissions import AllowAny 
 from .serializers import StudentSerializer, LibrarianSerializer 
 from rest_framework.response import Response
 from rest_framework.renderers import TemplateHTMLRenderer
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 from rest_framework.views import APIView
 from .permissions import IsApprovedLibrarian, IsAdminOrSelf
 
@@ -123,3 +124,33 @@ class CustomLoginView(AuthLoginView):
             form.add_error(None, "Your account is pending approval.")
             return self.form_invalid(form)
         return super().form_valid(form)
+    
+    
+@login_required
+def student_home(request):
+    if not hasattr(request.user, 'student'):
+        return redirect('home')
+    
+    student = request.user.student
+    borrowed_books = Transaction.objects.filter(borrower=student, is_returned=False)
+    
+    return render(request, 'general/student_home.html', {
+        'student': student,
+        'borrowed_books': borrowed_books,
+    })
+    
+@login_required
+def librarian_home(request):
+    if not hasattr(request.user, 'librarian') or not request.user.librarian.is_approved:
+        return redirect('home')
+    
+    context = {}
+    
+    
+    if request.user.is_staff:
+        context['pending_librarians'] = Librarian.objects.filter(is_approved=False)
+        context['recent_transactions'] = Transaction.objects.all().order_by('-transaction_date')[:10]
+        
+        
+        
+        return render(request, 'general/librarian_home.html', context)
