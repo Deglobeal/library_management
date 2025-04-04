@@ -1,4 +1,5 @@
 from django.db import models
+from Users.models import User
 
 # Create your models here.
 class Book(models.Model):
@@ -15,6 +16,14 @@ class Book(models.Model):
         blank=True,
         default='book_covers/default.jpg'
     )
+    added_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL,
+        null=True,
+        limi_choice_to = {'user_type': 'librarian'},
+        related_name='added_books')
+    
+    date_added = models.DateTimeField(auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.title
+        return f"{self.title} by {self.author}"
