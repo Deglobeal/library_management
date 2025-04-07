@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+
 {% block title %}Student Dashboard{% endblock %}
 
 {% block content %}
@@ -18,175 +18,163 @@
             {% endfor %}
         </ul>
     </div>
-    
-<div class="container mt-4">
-    <div class="available-books-section">
-        <h3>Available Books</h3>
-        {% if available_books %}
-        <ul>
-            {% for book in available_books %}
-            <li>{{ book.title }} ({{ book.copies_available }} available)</li>
-            {% endfor %}
-        </ul>
-        {% else %}
-            <p>No books are currently available.</p>
-        {% endif %}
-    </div>
-    <div class="row">
-        {% for book in books %}
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                {% if book.picture %}
-                <img src="{{ book.picture.url }}" class="card-img-top" alt="{{ book.title }}" style="height: 300px; object-fit: cover;">
-                {% else %}
-                <div class="text-center py-5 bg-light">
-                    <i class="fas fa-book fa-3x text-muted"></i>
-                </div>
-                {% endif %}
-                
-                <div class="card-body">
-                    <h5 class="card-title">{{ book.title }}</h5>
-                    <p class="card-text">
-                        <strong>Author:</strong> {{ book.author }}<br>
-                        <strong>ISBN:</strong> {{ book.isbn }}<br>
-                        <strong>Available Copies:</strong> {{ book.copies_available }}
-                    </p>
-                </div>
-                
-                <div class="card-footer bg-white">
-                    <small class="text-muted">
-                        Published: {{ book.published_date|date:"M Y" }}
-                    </small>
-                </div>
-            </div>
-        </div>
-        {% empty %}
-        <div class="col-12">
-            <div class="alert alert-info">
-                No books available at the moment.
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-</div>
-
-
-
-
-<div class="student-dashboard">
-    <h1>Welcome, {{ student.user.username }}</h1>
-    
-    {% if overdue_books %}
-    <div class="alert alert-danger">
-        <h2>Overdue Books!</h2>
-        <ul>
-            {% for transaction in overdue_books %}
-            <li>
-                {{ transaction.book.title }} - 
-                Due {{ transaction.due_date|date:"M d" }} 
-                ({{ transaction.due_date|timesince }} overdue)
-            </li>
-            {% endfor %}
-        </ul>
-    </div>
     {% endif %}
 
-    <div class="borrowing-status">
-        <h2>Borrowing Status</h2>
-        <p>Books borrowed: {{ current_borrowed.count }}/{{ max_books }}</p>
-        {% if not can_borrow %}
-        <p class="text-danger">⚠️ Cannot borrow new books at this time</p>
-        {% endif %}
+    <!-- Dashboard Header -->
+    <div class="dashboard-header mb-4">
+        <h1>Welcome, {{ student.user.username }}</h1>
+        <div class="borrowing-status alert alert-secondary">
+            <h4>Borrowing Status</h4>
+            <p class="mb-0">
+                Books borrowed: {{ current_borrowed.count }}/{{ max_books }}
+                {% if not can_borrow %}
+                <span class="text-danger ml-3">⚠️ Borrowing suspended</span>
+                {% endif %}
+            </p>
+        </div>
     </div>
 
-    <div class="available-books">
-        <h2>Available Books</h2>
-        {% if can_borrow %}
+    <!-- All Books Section -->
+    <div class="section all-books mb-5">
+        <h2 class="mb-4">All Library Books</h2>
         <div class="row">
-            {% for book in available_books %}
+            {% for book in all_books %}
             <div class="col-md-4 mb-4">
-                <div class="card">
+                <div class="card h-100">
+                    {% if book.picture %}
+                    <img src="{{ book.picture.url }}" class="card-img-top" alt="{{ book.title }}" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                    <div class="text-center py-4 bg-light">
+                        <i class="fas fa-book fa-3x text-muted"></i>
+                    </div>
+                    {% endif %}
+                    
                     <div class="card-body">
                         <h5 class="card-title">{{ book.title }}</h5>
                         <p class="card-text">
-                            Author: {{ book.author }}<br>
-                            Available copies: {{ book.copies_available }}
+                            <strong>Author:</strong> {{ book.author }}<br>
+                            <strong>ISBN:</strong> {{ book.isbn }}<br>
+                            <strong>Status:</strong> 
+                            <span class="{% if book.copies_available > 0 %}text-success{% else %}text-muted{% endif %}">
+                                {{ book.copies_available }} available
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No books found in the library catalog.
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Currently Borrowed Books -->
+    <div class="section borrowed-books mb-5">
+        <h2 class="mb-4">Currently Borrowed Books</h2>
+        {% if current_borrowed %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Book Title</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in current_borrowed %}
+                    <tr class="{% if transaction in overdue_books %}table-danger{% endif %}">
+                        <td>{{ transaction.book.title }}</td>
+                        <td>{{ transaction.due_date|date:"M d, Y" }}</td>
+                        <td>
+                            {% if transaction in overdue_books %}
+                            <span class="text-danger">Overdue</span>
+                            {% else %}
+                            Due in {{ transaction.due_date|timeuntil }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            No books currently borrowed
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Borrowing History -->
+    <div class="section returned-books mb-5">
+        <h2 class="mb-4">Borrowing History</h2>
+        {% if returned_books %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Book Title</th>
+                        <th>Borrow Date</th>
+                        <th>Return Date</th>
+                        <th>Duration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in returned_books %}
+                    <tr>
+                        <td>{{ transaction.book.title }}</td>
+                        <td>{{ transaction.checkout_date|date:"M d, Y" }}</td>
+                        <td>{{ transaction.return_date|date:"M d, Y" }}</td>
+                        <td>{{ transaction.checkout_date|timesince:transaction.return_date }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            No borrowing history available
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Available Books for Borrowing -->
+    {% if can_borrow %}
+    <div class="section available-books mb-5">
+        <h2 class="mb-4">Available for Borrowing</h2>
+        <div class="row">
+            {% for book in available_books %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ book.title }}</h5>
+                        <p class="card-text">
+                            <strong>Author:</strong> {{ book.author }}<br>
+                            <strong>Available Copies:</strong> {{ book.copies_available }}
                         </p>
                         <form method="POST">
                             {% csrf_token %}
                             <input type="hidden" name="book_id" value="{{ book.id }}">
                             <button type="submit" class="btn btn-primary">
-                                Borrow Book
+                                <i class="fas fa-book"></i> Borrow Book
                             </button>
                         </form>
                     </div>
                 </div>
             </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No books currently available for borrowing
+                </div>
+            </div>
             {% endfor %}
         </div>
-        {% else %}
-        <p class="text-muted">Borrowing functionality is currently disabled</p>
-        {% endif %}
     </div>
-
-    <div class="borrowed-books">
-        <h2>Currently Borrowed</h2>
-        {% if current_borrowed %}
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Book Title</th>
-                    <th>Due Date</th>
-                    <th>Days Remaining</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for transaction in current_borrowed %}
-                <tr class="{% if transaction in overdue_books %}table-danger{% endif %}">
-                    <td>{{ transaction.book.title }}</td>
-                    <td>{{ transaction.due_date|date:"M d, Y" }}</td>
-                    <td>
-                        {% if transaction in overdue_books %}
-                        Overdue by {{ transaction.due_date|timesince }}
-                        {% else %}
-                        {{ transaction.due_date|timeuntil }}
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <p>No books currently borrowed</p>
-        {% endif %}
-    </div>
-
-    <div class="returned-books">
-        <h2>Borrowing History</h2>
-        {% if returned_books %}
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Book Title</th>
-                    <th>Borrow Date</th>
-                    <th>Return Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for transaction in returned_books %}
-                <tr>
-                    <td>{{ transaction.book.title }}</td>
-                    <td>{{ transaction.checkout_date|date:"M d, Y" }}</td>
-                    <td>{{ transaction.return_date|date:"M d, Y" }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <p>No books returned yet</p>
-        {% endif %}
-    </div>
+    {% endif %}
 </div>
-
 {% endblock %}
