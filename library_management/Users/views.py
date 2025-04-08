@@ -13,6 +13,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.contrib import messages
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.http import JsonResponse
 from rest_framework.views import APIView
 from .permissions import IsApprovedLibrarian, IsAdminOrSelf
@@ -149,7 +150,7 @@ def student_home(request):
     cart = BookCart(request)  # Initialize cart here
     student = request.user.student
     
-    available_books = Book.objects.filter(status='APPROVED', copies_available__gt=0).order_by('-title')      
+    available_books = Book.objects.filter(status='APPROVED', copies_available__gt=0).order_by('title')      
     
     # Handle POST requests first
     if request.method == 'POST':
@@ -192,7 +193,7 @@ def handle_borrow_request(request, cart):
     selected_ids = cart.get_selected()
     
     try:
-        with db_transaction.atomic():  # Use renamed import
+        with transaction.atomic():  
             for book_id in selected_ids:
                 book = Book.objects.select_for_update().get(
                     id=book_id,
@@ -222,6 +223,72 @@ def handle_borrow_request(request, cart):
         messages.error(request, str(e))
     
     return redirect('student-home')
+
+
+@login_required
+def student_all_books(request):
+    if not hasattr(request.user, 'student'):
+        return redirect('home')
+    
+    student = request.user.student
+    all_books = Book.objects.filter(status='APPROVED').order_by('title')
+    
+    context = {
+        'student': student,
+        'all_books': all_books,
+        'cart_count': len(BookCart(request).get_selected())
+    }
+    
+    return render(request, 'general/student_section.html', context)
+
+@login_required
+def current_borrowed_books(request):
+    if not hasattr(request.user, 'student'):
+        return redirect('home')
+    
+    context = {
+        'current_borrowed': Transaction.objects.filter(
+            user=request.user, 
+            return_date__isnull=True
+        ).select_related('book'),
+        'section_title': 'Currently Borrowed Books',
+    }
+    
+    return render(request, 'general/student_section.html', context)
+
+@login_required
+def borrowing_history(request):
+    if not hasattr(request.user, 'student'):
+        return redirect('home')
+    
+    context = {
+        'returned_books': Transaction.objects.filter(
+            user=request.user, 
+            return_date__isnull=False
+        ).order_by('-return_date'),
+        'section_title': 'Borrowing History',
+    }
+    return render(request, 'general/student_section.html', context)
+
+@login_required
+def borrowing_status(request):
+    if not hasattr(request.user, 'student'):
+        return redirect('home')
+    
+    current_borrowed = Transaction.objects.filter(
+        user=request.user, 
+        return_date__isnull=True
+    )
+    overdue_books = current_borrowed.filter(due_date__lt=timezone.now())
+    
+    context = {
+        'current_borrowed_count': current_borrowed.count(),
+        'overdue_books': overdue_books,
+        'max_books': 3,
+        'section_title': 'Borrowing Status'
+    }
+    return render(request, 'general/student_section.html', context)
+    
 
 
     
