@@ -31,12 +31,14 @@
                 <span class="text-danger ml-3">⚠️ Borrowing suspended</span>
                 {% endif %}
             </p>
+            <p><a href="{% url 'borrowing-status' %}" class="btn btn-primary">Status</a></p>
         </div>
     </div>
 
     <!-- All Books Section -->
     <div class="section all-books mb-5">
         <h2 class="mb-4">All Library Books</h2>
+        <p><a href="{% url 'all-library-books' %}" class="btn btn-primary">View All Books</a></p>
         <div class="row">
             {% for book in all_books %}
             <div class="col-md-4 mb-4">
@@ -101,6 +103,7 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <p><a href="{% url 'current-borrowed' %}" class="btn btn-primary">Borrowed Books</a></p>
         </div>
         {% else %}
         <div class="alert alert-info">
@@ -134,6 +137,7 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <p><a href="{% url 'borrowing-history' %}" class="btn btn-primary">History</a></p>
         </div>
         {% else %}
         <div class="alert alert-info">

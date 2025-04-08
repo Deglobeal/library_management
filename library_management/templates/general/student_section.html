@@ -1,0 +1,40 @@
+<!-- templates/general/student_section.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ section_title }}</h2>
+    
+    <!-- All Books Section -->
+    {% if all_books %}
+    <div class="row">
+        {% for book in all_books %}
+        <div class="col-md-4 mb-4">
+            <!-- Book card template -->
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Borrowed Books Section -->
+    {% if current_borrowed %}
+    <div class="table-responsive">
+        <!-- Borrowed books table -->
+    </div>
+    {% endif %}
+
+    <!-- Borrowing History Section -->
+    {% if returned_books %}
+    <div class="table-responsive">
+        <!-- History table -->
+    </div>
+    {% endif %}
+
+    <!-- Status Section -->
+    {% if current_borrowed_count %}
+    <div class="alert alert-info">
+        <!-- Status information -->
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

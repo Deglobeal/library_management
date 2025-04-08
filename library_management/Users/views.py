@@ -211,7 +211,7 @@ def handle_borrow_request(request, cart):
                 Transaction.objects.create(
                     user=student_user,
                     book=book,
-                    due_date=timezone.now() + timezone.timedelta(days=14)
+                    due_date=timezone.now() + timezone.timedelta(days=3)
                 )
                 book.copies_available -= 1
                 book.save()
