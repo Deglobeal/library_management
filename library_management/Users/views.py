@@ -230,18 +230,11 @@ def handle_borrow_request(request, cart):
 
 @login_required
 def student_all_books(request):
-    if not hasattr(request.user, 'student'):
-        return redirect('home')
-    
-    student = request.user.student
-    all_books = Book.objects.filter(status='APPROVED').order_by('title')
-    
     context = {
-        'student': student,
-        'all_books': all_books,
-        'cart_count': len(BookCart(request).get_selected())
+        'all_books': Book.objects.all().order_by('title'),
+        'section': 'books',
+        'section_title': 'All Library Books'
     }
-    
     return render(request, 'general/student_section.html', context)
 
 @login_required
@@ -255,6 +248,7 @@ def current_borrowed_books(request):
             return_date__isnull=True
         ).select_related('book'),
         'section_title': 'Currently Borrowed Books',
+        'section': 'borrowed'
     }
     
     return render(request, 'general/student_section.html', context)
@@ -402,3 +396,44 @@ def toggle_student_status(request):
                 student.user.save()
         messages.success(request, 'Student statuses updated successfully')
     return redirect('librarian-students') 
+
+@login_required
+def student_profile(request):
+    student = request.user.student
+    if request.method == 'POST':
+        user = request.user
+        user.first_name = request.POST.get('first_name', '')
+        user.last_name = request.POST.get('last_name', '')
+        user.email = request.POST.get('email', '')
+        user.phone = request.POST.get('phone', '')
+        user.address = request.POST.get('address', '')
+        user.save()
+        messages.success(request, 'Profile updated successfully')
+        return redirect('student-profile')
+    
+    return render(request, 'general/student_section.html', {
+        'section': 'profile',
+        'section_title': 'Update Profile'
+    })
+    
+@login_required
+def request_return(request):
+    if request.method == 'POST':
+        transaction_id = request.POST.get('transaction_id')
+        if not transaction_id:
+            messages.error(request, "Please select a book to return")
+            return redirect('student-borrowed')
+            
+        try:
+            transaction = Transaction.objects.get(
+                pk=transaction_id,
+                user=request.user,
+                return_date__isnull=True
+            )
+            transaction.status = 'RETURN_REQUESTED'
+            transaction.save()
+            messages.success(request, f'Return requested for "{transaction.book.title}"')
+        except Transaction.DoesNotExist:
+            messages.error(request, "Invalid book selection")
+    
+    return redirect('student-borrowed')

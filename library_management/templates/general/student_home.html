@@ -1,184 +1,35 @@
+<!-- templates/general/student_home.html -->
 {% extends 'base.html' %}
 
-{% block title %}Student Dashboard{% endblock %}
-
 {% block content %}
-<div class="container mt-4">
-    <!-- Overdue Books Alert -->
-    {% if overdue_books %}
-    <div class="alert alert-danger mb-4">
-        <h2><i class="fas fa-exclamation-triangle"></i> Overdue Books</h2>
-        <ul class="mb-0">
-            {% for transaction in overdue_books %}
-            <li>
-                {{ transaction.book.title }} - 
-                Due {{ transaction.due_date|date:"M d, Y" }}
-                ({{ transaction.due_date|timesince }} overdue)
-            </li>
-            {% endfor %}
-        </ul>
-    </div>
-    {% endif %}
-
-    <!-- Dashboard Header -->
-    <div class="dashboard-header mb-4">
-        <h1>Welcome, {{ student.user.username }}</h1>
-        <div class="borrowing-status alert alert-secondary">
-            <h4>Borrowing Status</h4>
-            <p class="mb-0">
-                Books borrowed: {{ current_borrowed.count }}/{{ max_books }}
-                {% if not can_borrow %}
-                <span class="text-danger ml-3">⚠️ Borrowing suspended</span>
-                {% endif %}
-            </p>
-            <p><a href="{% url 'borrowing-status' %}" class="btn btn-primary">Status</a></p>
-        </div>
-    </div>
-
-    <!-- All Books Section -->
-    <div class="section all-books mb-5">
-        <h2 class="mb-4">All Library Books</h2>
-        <p><a href="{% url 'all-library-books' %}" class="btn btn-primary">View All Books</a></p>
-        <div class="row">
-            {% for book in all_books %}
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    {% if book.picture %}
-                    <img src="{{ book.picture.url }}" class="card-img-top" alt="{{ book.title }}" style="height: 200px; object-fit: cover;">
-                    {% else %}
-                    <div class="text-center py-4 bg-light">
-                        <i class="fas fa-book fa-3x text-muted"></i>
-                    </div>
-                    {% endif %}
-                    
-                    <div class="card-body">
-                        <h5 class="card-title">{{ book.title }}</h5>
-                        <p class="card-text">
-                            <strong>Author:</strong> {{ book.author }}<br>
-                            <strong>ISBN:</strong> {{ book.isbn }}<br>
-                            <strong>Status:</strong> 
-                            <span class="{% if book.copies_available > 0 %}text-success{% else %}text-muted{% endif %}">
-                                {{ book.copies_available }} available
-                            </span>
-                        </p>
-                    </div>
-                </div>
+<div class="container">
+    <h2>Student Dashboard</h2>
+    <div class="row">
+        <!-- Sidebar Navigation -->
+        <div class="col-md-3">
+            <div class="list-group">
+                <a href="{% url 'student-home' %}" class="list-group-item list-group-item-action active">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a href="{% url 'student-books' %}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-book-open"></i> Browse Books
+                </a>
+                <a href="{% url 'student-borrowed' %}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-bookmark"></i> My Borrowed Books
+                </a>
+                <a href="{% url 'student-history' %}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-history"></i> Borrowing History
+                </a>
+                <a href="{% url 'student-profile' %}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-user-edit"></i> Update Profile
+                </a>
             </div>
-            {% empty %}
-            <div class="col-12">
-                <div class="alert alert-info">
-                    No books found in the library catalog.
-                </div>
-            </div>
-            {% endfor %}
         </div>
-    </div>
 
-    <!-- Currently Borrowed Books -->
-    <div class="section borrowed-books mb-5">
-        <h2 class="mb-4">Currently Borrowed Books</h2>
-        {% if current_borrowed %}
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead class="thead-light">
-                    <tr>
-                        <th>Book Title</th>
-                        <th>Due Date</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for transaction in current_borrowed %}
-                    <tr class="{% if transaction in overdue_books %}table-danger{% endif %}">
-                        <td>{{ transaction.book.title }}</td>
-                        <td>{{ transaction.due_date|date:"M d, Y" }}</td>
-                        <td>
-                            {% if transaction in overdue_books %}
-                            <span class="text-danger">Overdue</span>
-                            {% else %}
-                            Due in {{ transaction.due_date|timeuntil }}
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <p><a href="{% url 'current-borrowed' %}" class="btn btn-primary">Borrowed Books</a></p>
-        </div>
-        {% else %}
-        <div class="alert alert-info">
-            No books currently borrowed
-        </div>
-        {% endif %}
-    </div>
-
-    <!-- Borrowing History -->
-    <div class="section returned-books mb-5">
-        <h2 class="mb-4">Borrowing History</h2>
-        {% if returned_books %}
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead class="thead-light">
-                    <tr>
-                        <th>Book Title</th>
-                        <th>Borrow Date</th>
-                        <th>Return Date</th>
-                        <th>Duration</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for transaction in returned_books %}
-                    <tr>
-                        <td>{{ transaction.book.title }}</td>
-                        <td>{{ transaction.checkout_date|date:"M d, Y" }}</td>
-                        <td>{{ transaction.return_date|date:"M d, Y" }}</td>
-                        <td>{{ transaction.checkout_date|timesince:transaction.return_date }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <p><a href="{% url 'borrowing-history' %}" class="btn btn-primary">History</a></p>
-        </div>
-        {% else %}
-        <div class="alert alert-info">
-            No borrowing history available
-        </div>
-        {% endif %}
-    </div>
-
-    <!-- Available Books for Borrowing -->
-    {% if can_borrow %}
-    <div class="section available-books mb-5">
-        <h2 class="mb-4">Available for Borrowing</h2>
-        <div class="row">
-            {% for book in available_books %}
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ book.title }}</h5>
-                        <p class="card-text">
-                            <strong>Author:</strong> {{ book.author }}<br>
-                            <strong>Available Copies:</strong> {{ book.copies_available }}
-                        </p>
-                        <form method="POST">
-                            {% csrf_token %}
-                            <input type="hidden" name="book_id" value="{{ book.id }}">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-book"></i> Borrow Book
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            {% empty %}
-            <div class="col-12">
-                <div class="alert alert-info">
-                    No books currently available for borrowing
-                </div>
-            </div>
-            {% endfor %}
+        <!-- Main Content -->
+        <div class="col-md-9">
+            {% include 'general/student_section.html' %}
         </div>
     </div>
-    {% endif %}
 </div>
 {% endblock %}

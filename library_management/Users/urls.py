@@ -15,13 +15,14 @@ from .views import (
 )
 urlpatterns = [
     # Student Endpoints
-    path('students/<str:pk>/', StudentView.as_view({'get': 'list', 'post': 'create'}), name='student-list'),
-    path('students/<str:pk>/', StudentView.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='student-detail'),
-    path('student/books/all/', views.student_all_books, name='all-library-books'),
-    path('student/books/borrowed/', views.current_borrowed_books, name='current-borrowed'),
-    path('student/books/history/', views.borrowing_history, name='borrowing-history'),
-    path('student/status/', views.borrowing_status, name='borrowing-status'),
-
+    path('student/dashboard/', student_home, name='student-home'),
+    path('student/books/', views.student_all_books, name='student-books'),
+    path('student/books/borrowed/', views.current_borrowed_books, name='student-borrowed'),
+    path('student/books/history/', views.borrowing_history, name='student-history'),
+    path('student/status/', views.borrowing_status, name='student-status'),
+    path('student/profile/', views.student_profile, name='student-profile'),
+    path('student/return-request/', views.request_return, name='return-request'),
+    
     # Librarian Endpoints
     path('librarians/', LibrarianViewSet.as_view({'get': 'list', 'post': 'create'}), name='librarian-list'),
     path('librarians/<int:pk>/', LibrarianViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='librarian-detail'),
@@ -38,9 +39,9 @@ urlpatterns = [
     path('librarian/students/toggle-status/', views.toggle_student_status, name='toggle-student-status'),
     path('librarian/books/<int:pk>/delete/', views.BookDeleteView.as_view(), name='book-delete'),
     path('librarian/approve-books/', views.pending_approvals, name='pending-approvals'),
-path('librarian/approve-transaction/<int:pk>/', views.approve_transaction, name='approve-transaction'),
-path('librarian/reject-transaction/<int:pk>/', views.reject_transaction, name='reject-transaction'),
-    
+    path('librarian/approve-transaction/<int:pk>/', views.approve_transaction, name='approve-transaction'),
+    path('librarian/reject-transaction/<int:pk>/', views.reject_transaction, name='reject-transaction'),
+        
     # Use only the custom login view
     path('login/', CustomLoginView.as_view(template_name='auth/login.html'), name='login'),
     path('logout/', LogoutView.as_view(next_page='home'), name='logout'),
