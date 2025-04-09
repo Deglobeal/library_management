@@ -1,0 +1,45 @@
+{% extends 'general/librarian_home.html' %}
+
+{% block librarian_content %}
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Book Title</th>
+                <th>Student</th>
+                <th>Borrow Date</th>
+                <th>Request Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in return_requests %}
+            <tr>
+                <td>{{ transaction.book.title }}</td>
+                <td>{{ transaction.user.get_full_name }}</td>
+                <td>{{ transaction.checkout_date|date:"M d, Y" }}</td>
+                <td>{{ transaction.modified|date:"M d, Y" }}</td>
+                <td>
+                    <form method="POST" action="{% url 'approve-return' transaction.pk %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success btn-sm">
+                            <i class="fas fa-check"></i> Approve
+                        </button>
+                    </form>
+                    <form method="POST" action="{% url 'reject-return' transaction.pk %}" class="d-inline ms-2">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            <i class="fas fa-times"></i> Reject
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center text-muted">No pending return requests</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
