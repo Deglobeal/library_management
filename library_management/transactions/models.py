@@ -12,6 +12,7 @@ class Transaction(models.Model):
         ('RETURNED', 'Returned'),
         ('RETURN_REQUESTED', 'Return Requested'),
     ]
+    modified = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='transactions', limit_choices_to={'user_type': 'student'})
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='transactions')

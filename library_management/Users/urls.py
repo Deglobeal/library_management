@@ -41,7 +41,11 @@ urlpatterns = [
     path('librarian/approve-books/', views.pending_approvals, name='pending-approvals'),
     path('librarian/approve-transaction/<int:pk>/', views.approve_transaction, name='approve-transaction'),
     path('librarian/reject-transaction/<int:pk>/', views.reject_transaction, name='reject-transaction'),
-        
+    path('librarian/return-requests/', views.pending_return_requests, name='pending-return-requests'),
+    path('librarian/return-requests/approve/<int:pk>/', views.approve_return, name='approve-return'),
+    path('librarian/return-requests/reject/<int:pk>/', views.reject_return, name='reject-return'),
+
+    
     # Use only the custom login view
     path('login/', CustomLoginView.as_view(template_name='auth/login.html'), name='login'),
     path('logout/', LogoutView.as_view(next_page='home'), name='logout'),
