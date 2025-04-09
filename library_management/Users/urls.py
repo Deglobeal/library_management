@@ -35,9 +35,11 @@ urlpatterns = [
     path('librarian/overdue-books/', views.librarian_section, {'section': 'overdue-books'}, name='overdue-books'),
     path('librarian/returned-books/', views.librarian_section, {'section': 'returned-books'}, name='returned-books'),
     path('librarian/approved-librarians/', views.librarian_section, {'section': 'approved-librarians'}, name='approved-librarians'),
-        
-    
-    
+    path('librarian/students/toggle-status/', views.toggle_student_status, name='toggle-student-status'),
+    path('librarian/books/<int:pk>/delete/', views.BookDeleteView.as_view(), name='book-delete'),
+    path('librarian/approve-books/', views.pending_approvals, name='pending-approvals'),
+path('librarian/approve-transaction/<int:pk>/', views.approve_transaction, name='approve-transaction'),
+path('librarian/reject-transaction/<int:pk>/', views.reject_transaction, name='reject-transaction'),
     
     # Use only the custom login view
     path('login/', CustomLoginView.as_view(template_name='auth/login.html'), name='login'),

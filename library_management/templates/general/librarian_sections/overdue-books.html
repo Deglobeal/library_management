@@ -1,0 +1,33 @@
+{% extends 'general/librarian_home.html' %}
+
+{% block librarian_content %}
+<h3>Overdue Books</h3>
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>Book Title</th>
+                <th>Borrower</th>
+                <th>Due Date</th>
+                <th>Days Overdue</th>
+                <th>Fine</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in transactions %}
+            <tr>
+                <td>{{ transaction.book.title }}</td>
+                <td>{{ transaction.user.get_full_name }}</td>
+                <td>{{ transaction.due_date|date:"M d, Y" }}</td>
+                <td>{{ transaction.days_overdue }}</td>
+                <td>${{ transaction.calculate_fine }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">No overdue books found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

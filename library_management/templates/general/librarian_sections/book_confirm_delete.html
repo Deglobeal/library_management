@@ -1,0 +1,12 @@
+{% extends 'general/librarian_home.html' %}
+{% block librarian_content %}
+<div class="alert alert-danger">
+    <h4>Confirm Delete</h4>
+    <p>Are you sure you want to delete "{{ object.title }}"?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Confirm Delete</button>
+        <a href="{% url 'librarian-books' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

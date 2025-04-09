@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.views import LoginView as AuthLoginView
 from rest_framework import viewsets, permissions, status
 from books.models import Book 
@@ -18,7 +18,7 @@ from django.http import JsonResponse
 from rest_framework.views import APIView
 from .permissions import IsApprovedLibrarian, IsAdminOrSelf
 from .utils import BookCart  
-from django.views.generic import ListView, CreateView, UpdateView, DetailView
+from django.views.generic import ListView, CreateView, UpdateView, DetailView, DeleteView
 from django.urls import reverse_lazy
 
 
@@ -356,3 +356,49 @@ class BookListView(ListView):
 class BookDetailView(DetailView):
     model = Book
     template_name = 'general/librarian_sections/book_detail.html'
+
+    
+class BookDeleteView(DeleteView):
+    model = Book
+    template_name = 'general/librarian_sections/book_confirm_delete.html'
+    success_url = reverse_lazy('librarian-books')
+    
+    def dispatch(self, request, *args, **kwargs):
+        if not (request.user.librarian.is_approved if hasattr(request.user, 'librarian') else False):
+            return redirect('home')
+        return super().dispatch(request, *args, **kwargs)
+
+@login_required
+def pending_approvals(request):
+    pending = Transaction.objects.filter(status='PENDING')
+    return render(request, 'general/librarian_sections/approve_borrowed.html', 
+                {'pending_approvals': pending})
+
+@login_required
+def approve_transaction(request, pk):
+    transaction = get_object_or_404(Transaction, pk=pk)
+    transaction.status = 'APPROVED'
+    transaction.save()
+    messages.success(request, 'Transaction approved successfully')
+    return redirect('pending-approvals')
+
+@login_required
+def reject_transaction(request, pk):
+    transaction = get_object_or_404(Transaction, pk=pk)
+    transaction.status = 'REJECTED'
+    transaction.save()
+    messages.success(request, 'Transaction rejected')
+    return redirect('pending-approvals') 
+
+@login_required
+def toggle_student_status(request):
+    if request.method == 'POST':
+        for key in request.POST:
+            if key.startswith('student_'):
+                user_id = key.split('_')[1]
+                student = get_object_or_404(Student, user__user_id=user_id)
+                action = request.POST.get(key)
+                student.user.is_active = (action == 'activate')
+                student.user.save()
+        messages.success(request, 'Student statuses updated successfully')
+    return redirect('librarian-students') 

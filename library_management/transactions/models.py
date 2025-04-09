@@ -5,6 +5,13 @@ from books.models import Book
 from django.conf import settings
 
 class Transaction(models.Model):
+    STATUS_CHOICES = [
+        ('PENDING', 'Pending'),
+        ('APPROVED', 'Approved'),
+        ('REJECTED', 'Rejected'),
+        ('RETURNED', 'Returned'),
+    ]
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='transactions', limit_choices_to={'user_type': 'student'})
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='transactions')
     checkout_date = models.DateTimeField(auto_now_add=True)

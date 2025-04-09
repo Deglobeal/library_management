@@ -1,0 +1,39 @@
+{% extends 'general/librarian_home.html' %}
+{% block librarian_content %}
+<h3>Pending Book Approvals</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Student</th>
+            <th>Book</th>
+            <th>Request Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for transaction in pending_approvals %}
+        <tr>
+            <td>{{ transaction.user.get_full_name }}</td>
+            <td>{{ transaction.book.title }}</td>
+            <td>{{ transaction.transaction_date|date:"M d, Y" }}</td>
+            <td>
+                <form method="post" action="{% url 'approve-transaction' transaction.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                </form>
+                <form method="post" action="{% url 'reject-transaction' transaction.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm mt-1">Reject</button>
+                </form>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4" class="text-center">No pending approvals</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+

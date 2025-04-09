@@ -22,8 +22,14 @@
             <td>
                 <a href="{% url 'book-update' book.pk %}" class="btn btn-sm btn-warning">Edit</a>
             </td>
+            <td>
+                <a href="{% url 'book-update' book.pk %}" class="btn btn-sm btn-warning">Edit</a>
+                <a href="{% url 'book-delete' book.pk %}" class="btn btn-sm btn-danger">Delete</a>
+            </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 {% endblock %}
+
+
