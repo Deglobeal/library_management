@@ -4,8 +4,37 @@
 {% block content %}
 <div class="container">
     <h2>Librarian Dashboard</h2>
-    
-    <!-- Add logout button -->
-
+    <div class="row">
+        <div class="col-md-4">
+            <div class="list-group">
+                <a href="{% url 'librarian-students' %}" class="list-group-item list-group-item-action">
+                    Manage Students
+                </a>
+                <a href="{% url 'librarian-books' %}" class="list-group-item list-group-item-action">
+                    View All Books
+                </a>
+                <a href="{% url 'book-create' %}" class="list-group-item list-group-item-action">
+                    Add New Book
+                </a>
+                <a href="{% url 'overdue-books' %}" class="list-group-item list-group-item-action">
+                    Overdue Books
+                </a>
+                <a href="{% url 'returned-books' %}" class="list-group-item list-group-item-action">
+                    Returned Books History
+                </a>
+                <a href="{% url 'approved-librarians' %}" class="list-group-item list-group-item-action">
+                    Approved Librarians
+                </a>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <!-- Content will be loaded from individual sections -->
+            {% block librarian_content %}
+            <div class="alert alert-info">
+                Select an option from the menu to get started
+            </div>
+            {% endblock %}
+        </div>
+    </div>
 </div>
 {% endblock %}

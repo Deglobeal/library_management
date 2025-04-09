@@ -1,0 +1,29 @@
+{% extends 'general/librarian_home.html' %}
+{% block librarian_content %}
+<h3>All Books</h3>
+<div class="mb-3">
+    <a href="{% url 'book-create' %}" class="btn btn-success">Add New Book</a>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Available Copies</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for book in books %}
+        <tr>
+            <td><a href="{% url 'book-detail' book.pk %}">{{ book.title }}</a></td>
+            <td>{{ book.author }}</td>
+            <td>{{ book.copies_available }}</td>
+            <td>
+                <a href="{% url 'book-update' book.pk %}" class="btn btn-sm btn-warning">Edit</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

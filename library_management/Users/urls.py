@@ -26,6 +26,19 @@ urlpatterns = [
     path('librarians/', LibrarianViewSet.as_view({'get': 'list', 'post': 'create'}), name='librarian-list'),
     path('librarians/<int:pk>/', LibrarianViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='librarian-detail'),
     
+    
+    path('librarian/students/', views.librarian_section, {'section': 'students'}, name='librarian-students'),
+    path('librarian/books/', views.BookListView.as_view(), name='librarian-books'),
+    path('librarian/books/add/', views.BookCreateView.as_view(), name='book-create'),
+    path('librarian/books/<int:pk>/', views.BookDetailView.as_view(), name='book-detail'),
+    path('librarian/books/<int:pk>/update/', views.BookUpdateView.as_view(), name='book-update'),
+    path('librarian/overdue-books/', views.librarian_section, {'section': 'overdue-books'}, name='overdue-books'),
+    path('librarian/returned-books/', views.librarian_section, {'section': 'returned-books'}, name='returned-books'),
+    path('librarian/approved-librarians/', views.librarian_section, {'section': 'approved-librarians'}, name='approved-librarians'),
+        
+    
+    
+    
     # Use only the custom login view
     path('login/', CustomLoginView.as_view(template_name='auth/login.html'), name='login'),
     path('logout/', LogoutView.as_view(next_page='home'), name='logout'),

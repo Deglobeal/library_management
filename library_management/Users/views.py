@@ -17,7 +17,10 @@ from django.db import transaction
 from django.http import JsonResponse
 from rest_framework.views import APIView
 from .permissions import IsApprovedLibrarian, IsAdminOrSelf
-from .utils import BookCart  # Adjust the path to match the actual location of the utils module
+from .utils import BookCart  
+from django.views.generic import ListView, CreateView, UpdateView, DetailView
+from django.urls import reverse_lazy
+
 
 # Viewset for Student
 class StudentView(viewsets.ModelViewSet): 
@@ -297,16 +300,59 @@ def borrowing_status(request):
     
 @login_required
 def librarian_home(request):
-    # Check if user is an approved librarian
     if not hasattr(request.user, 'librarian') or not request.user.librarian.is_approved:
         return redirect('home')
     
     context = {}
     
-    # Add staff-specific data to context
     if request.user.is_staff:
         context['pending_librarians'] = Librarian.objects.filter(is_approved=False)
         context['recent_transactions'] = Transaction.objects.all().order_by('-transaction_date')[:10]
     
-    # Always render the template, even for non-staff librarians
     return render(request, 'general/librarian_home.html', context)
+
+@login_required
+def librarian_section(request, section):
+    context = {'section' : section}
+    template = f'general/librarian_sections/{section}.html'
+    
+    if section == 'students':
+        context['students'] = Student.objects.all()
+    elif section == 'overdue-books':
+        context['transactions'] = Transaction.objects.filter(
+            return_date__isnull=True, 
+            due_date__lt=timezone.now()
+        )
+    elif section == 'returned-books':
+        context['transactions'] = Transaction.objects.filter(
+            return_date__isnull=False
+        ).order_by('-return_date')
+    elif section == 'approved-librarians':
+        context['librarians'] = Librarian.objects.filter(is_approved=True)
+    
+    return render(request, template, context)
+
+class BookCreateView(CreateView):
+    model = Book
+    fields = ['title', 'author', 'isbn', 'genre', 'copies_available', 'status']
+    template_name = 'general/librarian_sections/book_form.html'
+    success_url = reverse_lazy('librarian-home')
+    
+    def form_valid(self, form):
+        form.instance.added_by = self.request.user.librarian
+        return super().form_valid(form)
+    
+class BookUpdateView(UpdateView):
+    model = Book
+    fields = ['title', 'author', 'isbn', 'genre', 'copies_available', 'status']
+    template_name = 'general/librarian_sections/book_form.html'
+    success_url = reverse_lazy('librarian-home')
+    
+class BookListView(ListView):
+    model = Book
+    template_name = 'general/librarian_sections/books.html'
+    context_object_name = 'books'
+
+class BookDetailView(DetailView):
+    model = Book
+    template_name = 'general/librarian_sections/book_detail.html'
