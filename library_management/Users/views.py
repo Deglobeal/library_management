@@ -437,3 +437,35 @@ def request_return(request):
             messages.error(request, "Invalid book selection")
     
     return redirect('student-borrowed')
+
+@login_required
+def pending_return_requests(request):
+    context = {
+        'return_requests': Transaction.objects.filter(
+            status='RETURN_REQUESTED'
+        ).select_related('book', 'user'),
+        'section': 'return-requests',
+        'section_title': 'Pending Return Requests'
+    }
+    return render(request, 'general/librarian_sections/return_requests.html', context)
+
+@login_required
+def approve_return(request, pk):
+    transaction = get_object_or_404(Transaction, pk=pk)
+    if request.method == 'POST':
+        transaction.status = 'RETURNED'
+        transaction.return_date = timezone.now()
+        transaction.book.copies_available += 1
+        transaction.book.save()
+        transaction.save()
+        messages.success(request, f'Return approved for {transaction.book.title}')
+    return redirect('pending-return-requests')
+
+@login_required
+def reject_return(request, pk):
+    transaction = get_object_or_404(Transaction, pk=pk)
+    if request.method == 'POST':
+        transaction.status = 'APPROVED'
+        transaction.save()
+        messages.warning(request, f'Return rejected for {transaction.book.title}')
+    return redirect('pending-return-requests')
