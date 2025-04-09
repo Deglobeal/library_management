@@ -1,4 +1,3 @@
-<!-- templates/general/librarian_home.html -->
 {% extends 'base.html' %}
 
 {% block content %}
@@ -28,10 +27,13 @@
                 <a href="{% url 'pending-approvals' %}" class="list-group-item list-group-item-action">
                     Approve Borrowed Books
                 </a>
+                <a href="{% url 'pending-return-requests' %}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-undo me-2"></i> Approve Returns
+                </a>
             </div>
         </div>
         <div class="col-md-8">
-            <!-- Content will be loaded from individual sections -->
+
             {% block librarian_content %}
             <div class="alert alert-info">
                 Select an option from the menu to get started

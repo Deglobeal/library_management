@@ -22,6 +22,7 @@ urlpatterns = [
     path('student/status/', views.borrowing_status, name='student-status'),
     path('student/profile/', views.student_profile, name='student-profile'),
     path('student/return-request/', views.request_return, name='return-request'),
+    path('student/books/borrow/<int:book_id>/', views.borrow_book, name='borrow-book'),
     
     # Librarian Endpoints
     path('librarians/', LibrarianViewSet.as_view({'get': 'list', 'post': 'create'}), name='librarian-list'),

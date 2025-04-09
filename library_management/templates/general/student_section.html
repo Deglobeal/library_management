@@ -152,35 +152,32 @@
                 {% for book in all_books %}
                 <div class="col">
                     <div class="card h-100 shadow-sm">
-                        {% if book.cover %}
-                        <img src="{{ book.cover.url }}" class="card-img-top" 
-                            alt="{{ book.title }}" style="height: 200px; object-fit: cover;">
-                        {% else %}
-                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
-                            style="height: 200px;">
-                            <i class="fas fa-book-open fa-3x text-muted"></i>
-                        </div>
-                        {% endif %}
+                        <!-- Book cover image -->
                         <div class="card-body">
                             <h5 class="card-title">{{ book.title }}</h5>
                             <p class="card-text">
-                                <span class="text-muted">by</span> {{ book.author }}<br>
-                                <span class="badge bg-secondary">{{ book.genre }}</span>
+                                <span class="badge {% if book.copies_available > 0 %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {{ book.copies_available }} available
+                                </span>
                             </p>
-                        </div>
-                        <div class="card-footer bg-transparent">
-                            <small class="text-muted">
-                                {{ book.copies_available }} available copies
-                            </small>
+                            {% if book.copies_available > 0 and can_borrow %}
+                            <form method="POST" action="{% url 'borrow-book' book.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-book me-2"></i>Borrow
+                                </button>
+                            </form>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
                 {% empty %}
                 <div class="col-12">
-                    <div class="alert alert-info">No books available in this category</div>
+                    <div class="alert alert-info">No books available</div>
                 </div>
                 {% endfor %}
             </div>
+            {% endif %}
 
             {% elif section == 'status' %}
             <!-- Status Overview Section -->

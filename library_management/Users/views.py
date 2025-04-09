@@ -230,10 +230,20 @@ def handle_borrow_request(request, cart):
 
 @login_required
 def student_all_books(request):
+    if not hasattr(request.user, 'student'):
+        return redirect('home')
+    
+    current_borrowed = Transaction.objects.filter(
+        user=request.user,
+        return_date__isnull=True
+    )
+    overdue = current_borrowed.filter(due_date__lt=timezone.now()).exists()
+    
     context = {
-        'all_books': Book.objects.all().order_by('title'),
+        'all_books': Book.objects.filter(status='APPROVED'),
+        'can_borrow': current_borrowed.count() < 3 and not overdue,
         'section': 'books',
-        'section_title': 'All Library Books'
+        'section_title': 'All Books'
     }
     return render(request, 'general/student_section.html', context)
 
@@ -469,3 +479,46 @@ def reject_return(request, pk):
         transaction.save()
         messages.warning(request, f'Return rejected for {transaction.book.title}')
     return redirect('pending-return-requests')
+
+
+@login_required
+def borrow_book(request, book_id):
+    if not hasattr(request.user, 'student'):
+        return redirect('home')
+    
+    book = get_object_or_404(Book, id=book_id)
+    student = request.user.student
+    
+    try:
+        with transaction.atomic():
+            # Check borrowing eligibility
+            current_borrowed = Transaction.objects.filter(
+                user=request.user,
+                return_date__isnull=True
+            )
+            overdue = current_borrowed.filter(due_date__lt=timezone.now()).exists()
+            
+            if current_borrowed.count() >= 3:
+                raise ValidationError("Maximum borrowing limit reached")
+            if overdue:
+                raise ValidationError("Cannot borrow with overdue books")
+            if book.copies_available < 1:
+                raise ValidationError("No copies available")
+            
+            # Create transaction
+            Transaction.objects.create(
+                user=request.user,
+                book=book,
+                due_date=timezone.now() + timezone.timedelta(days=14)
+            )
+            
+            # Update book copies
+            book.copies_available -= 1
+            book.save()
+            
+            messages.success(request, f'Successfully borrowed "{book.title}"')
+            
+    except Exception as e:
+        messages.error(request, str(e))
+    
+    return redirect('all-library-books')
