@@ -125,138 +125,104 @@ A **Library Management System (LMS)** is a software application designed to mana
 # **Library Management System** is an essential tool for modern libraries, enabling them to operate efficiently and provide better services to users. Whether it’s a small school library or a large university library, an LMS simplifies operations and enhances the overall experience for both librarians and users
 
 ---
+ Books API (REST API - via books.urls)
+GET /api/books/
 
-# **Week 1: Project Setup and Planning**
+POST /api/books/
 
-1. **Set Up the Django Project:**
-   - Install Django and Django REST Framework (DRF).
-   - Create a new Django project: `django-admin startproject library_management`.
-   - Create a new Django app: `python manage.py startapp api`.
-   - Add `rest_framework` and `api` to `INSTALLED_APPS` in `settings.py`.
+GET /api/books/<id>/
 
-2. **Set Up GitHub Repository:**
-   - Initialize a Git repository: `git init`.
-   - Create a `.gitignore` file to exclude unnecessary files (e.g., `*.pyc`, `__pycache__`, `env/`).
-   - Commit the initial project structure: `git add .` and `git commit -m "Initial commit"`.
-   - Create a GitHub repository and push the code: `git remote add origin <repo_url>` and `git push -u origin main`.
+PUT /api/books/<id>/
 
-3. **Define Models and Relationships:**
-   - Create the `Book`, `User`, and `Transaction` models in `api/models.py`.
-   - Define the fields and relationships (e.g., ForeignKey for `Transaction` model).
-   - Run migrations: `python manage.py makemigrations` and `python manage.py migrate`.
+DELETE /api/books/<id>/
 
-4. **Create a Basic API Structure:**
-   - Set up serializers for the models in `api/serializers.py`.
-   - Create views for basic CRUD operations in `api/views.py`.
-   - Define URLs in `api/urls.py` and include them in the main `urls.py`.
+Transactions API
+Assuming similar REST setup in transactions.urls:
 
-5. **Test the Setup:**
-   - Use Django’s development server: `python manage.py runserver`.
-   - Test the API endpoints using Postman or a browser.
+GET /api/transactions/
 
----
+POST /api/transactions/
 
-# **Week 2: Implement Book and User Management**
+GET /api/transactions/<id>/
 
-1. **Implement CRUD Operations for Books:**
-   - Create a `BookViewSet` in `api/views.py` using DRF’s `ModelViewSet`.
-   - Register the `BookViewSet` in `api/urls.py` using a `DefaultRouter`.
-   - Test the endpoints: `GET /api/books/`, `POST /api/books/`, `GET /api/books/<id>/`, etc.
+PUT /api/transactions/<id>/
 
-2. **Implement CRUD Operations for Users:**
-   - Create a `UserViewSet` in `api/views.py`.
-   - Register the `UserViewSet` in `api/urls.py`.
-   - Test the endpoints: `GET /api/users/`, `POST /api/users/`, `GET /api/users/<id>/`, etc.
+DELETE /api/transactions/<id>/
 
-3. **Write Unit Tests:**
-   - Create a `tests.py` file in the `api` app.
-   - Write tests for the `Book` and `User` endpoints using Django’s `TestCase`.
-   - Run tests: `python manage.py test`.
+🎓 Student Endpoints
+GET /Users/student/dashboard/
 
-4. **Refactor and Optimize:**
-   - Ensure proper error handling (e.g., 404 for non-existent books/users).
-   - Add validation for fields (e.g., unique ISBN, valid email).
+GET /Users/student/books/
 
----
+GET /Users/student/books/borrowed/
 
-# **Week 3: Implement Transaction Management**
+GET /Users/student/books/history/
 
-1. **Add Checkout Functionality:**
-   - Create a `TransactionSerializer` in `api/serializers.py`.
-   - Add a `checkout` action in `api/views.py` to handle book checkouts.
-   - Update the `Book` model’s `is_available` field when a book is checked out.
+GET /Users/student/status/
 
-2. **Add Return Functionality:**
-   - Add a `return` action in `api/views.py` to handle book returns.
-   - Update the `Book` model’s `is_available` field when a book is returned.
+GET /Users/student/profile/
 
-3. **Write Unit Tests for Transactions:**
-   - Write tests for the `checkout` and `return` endpoints.
-   - Test edge cases (e.g., checking out an unavailable book, returning a book twice).
+POST /Users/student/return-request/
 
-4. **Add Transaction History for Users:**
-   - Create an endpoint to list all transactions for a specific user: `GET /api/transactions/user/<id>/`.
-   - Test the endpoint.
+POST /Users/student/books/borrow/<book_id>/
 
----
+ Librarian Endpoints
+GET /Users/librarians/
 
-# **Week 4: Add Search and Filter Features**
+POST /Users/librarians/
 
-1. **Implement Search Functionality:**
-   - Add search functionality to the `BookViewSet` using DRF’s `SearchFilter`.
-   - Allow searching by `title`, `author`, and `ISBN`.
+GET /Users/librarians/<id>/
 
-2. **Implement Filter Functionality:**
-   - Add filtering by `is_available` status using DRF’s `DjangoFilterBackend`.
-   - Test the search and filter endpoints.
+PUT /Users/librarians/<id>/
 
-3. **Write Unit Tests for Search and Filter:**
-   - Write tests to verify search and filter functionality.
-   - Test edge cases (e.g., searching for non-existent books).
+DELETE /Users/librarians/<id>/
 
-4. **Refactor and Optimize:**
-   - Ensure the search and filter features are efficient.
-   - Add pagination for large datasets.
+ Librarian Book Management (Web Views)
+GET /Users/librarian/books/
 
----
+GET /Users/librarian/books/add/
 
-# **Week 5: Deployment and Final Touches**
+POST /Users/librarian/books/add/
 
-1. **Prepare for Deployment:**
-   - Switch from SQLite to PostgreSQL for production.
-   - Update `settings.py` to use environment variables for sensitive data (e.g., database credentials).
+GET /Users/librarian/books/<id>/
 
-2. **Deploy to Heroku or PythonAnywhere:**
-   - Create a `requirements.txt` file: `pip freeze > requirements.txt`.
-   - Create a `Procfile` for Heroku: `web: gunicorn library_management.wsgi`.
-   - Push the code to the deployment platform and configure the database.
+POST /Users/librarian/books/<id>/update/
 
-3. **Test the Deployed API:**
-   - Test all endpoints on the deployed API.
-   - Verify that the API works as expected in a production environment.
+POST /Users/librarian/books/<id>/delete/
 
-4. **Write Documentation:**
-   - Use Swagger or Postman to document the API endpoints.
-   - Include details like request/response examples, status codes, and error messages.
+ Admin & Librarian Features
+GET /Users/librarian/students/
 
-5. **Final Review and Cleanup:**
-   - Review the code for any bugs or improvements.
-   - Ensure all tests pass.
-   - Write a `README.md` file with project details, setup instructions, and usage examples.
+POST /Users/librarian/students/toggle-status/
 
----
+GET /Users/librarian/overdue-books/
 
-# **Additional Notes**
+GET /Users/librarian/returned-books/
 
-- **Authentication (Optional):**
-  - Use JWT or OAuth to secure the API.
-  - Add authentication to sensitive endpoints (e.g., checkout, return).
+GET /Users/librarian/approved-librarians/
 
-- **Error Handling:**
-  - Ensure proper error messages are returned for invalid requests.
+GET /Users/librarian/approve-books/
 
-- **Code Quality:**
-  - Follow PEP 8 guidelines for Python code.
-  - Use meaningful variable and function names.
+POST /Users/librarian/approve-transaction/<id>/
 
-By following this detailed breakdown, you should be able to complete the **Library Management System API** project within 5 weeks. Good luck
+POST /Users/librarian/reject-transaction/<id>/
+
+GET /Users/librarian/return-requests/
+
+POST /Users/librarian/return-requests/approve/<id>/
+
+POST /Users/librarian/return-requests/reject/<id>/
+
+ Auth & Registration
+GET /Users/login/
+
+POST /Users/login/
+
+GET /Users/logout/
+
+GET /Users/register/
+
+GET|POST /Users/register/student/
+
+GET|POST /Users/register/librarian/
+

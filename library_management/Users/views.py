@@ -521,4 +521,4 @@ def borrow_book(request, book_id):
     except Exception as e:
         messages.error(request, str(e))
     
-    return redirect('all-library-books')
+    return redirect('student-books')
