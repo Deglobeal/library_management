@@ -32,7 +32,7 @@ A **Library Management System (LMS)** is a software application designed to mana
    - Generate reports on book usage, overdue books, and user activity.
    - Provide insights into library operations.
 
-6. **Authentication and Security (Optional):**
+6. Authentication and Security (Optional):
    - Secure the system with user authentication (e.g., login for librarians and users).
    - Restrict access to sensitive operations (e.g., only librarians can add or delete books).
 
@@ -40,32 +40,32 @@ A **Library Management System (LMS)** is a software application designed to mana
 
 # **How a Library Management System Works**
 
-1. **Book Cataloging:**
+1. Book Cataloging:
    - Librarians add books to the system with details like title, author, and ISBN.
    - Books are categorized and stored in a database for easy retrieval.
 
-2. **User Registration:**
+2. User Registration:
    - Users (e.g., students or faculty) register in the system with their details.
    - Each user is assigned a unique ID for identification.
 
-3. **Book Checkout:**
+3. Book Checkout:
    - Users search for books and request to borrow them.
    - The system checks the book’s availability and assigns it to the user.
    - A due date is set for returning the book.
 
-4. **Book Return:**
+4. Book Return:
    - Users return books before or on the due date.
    - The system updates the book’s availability status.
 
-5. **Overdue Management:**
+5. Overdue Management:
    - The system tracks overdue books and notifies users.
    - Librarians can impose fines or restrictions on users with overdue books.
 
-6. **Search and Filter:**
+6. Search and Filter:
    - Users and librarians can search for books by title, author, or ISBN.
    - Books can be filtered by availability status or other criteria.
 
-7. **Reporting:**
+7. Reporting:
    - The system generates reports on book usage, user activity, and overdue books.
    - Librarians use these reports to make informed decisions.
 
@@ -122,10 +122,13 @@ A **Library Management System (LMS)** is a software application designed to mana
 4. **Deployment:**
    - Platforms: Heroku, PythonAnywhere, or AWS.
 
-# **Library Management System** is an essential tool for modern libraries, enabling them to operate efficiently and provide better services to users. Whether it’s a small school library or a large university library, an LMS simplifies operations and enhances the overall experience for both librarians and users
+# Library Management System is an essential tool for modern libraries, enabling them to operate efficiently and provide better services to users. Whether it’s a small school library or a large university library, an LMS simplifies operations and enhances the overall experience for both librarians and users
 
 ---
- Books API (REST API - via books.urls)
+# Books API
+
+(REST API - via books.urls)
+
 GET /api/books/
 
 POST /api/books/
@@ -136,7 +139,8 @@ PUT /api/books/<id>/
 
 DELETE /api/books/<id>/
 
-Transactions API
+# Transactions API
+
 Assuming similar REST setup in transactions.urls:
 
 GET /api/transactions/
@@ -149,7 +153,8 @@ PUT /api/transactions/<id>/
 
 DELETE /api/transactions/<id>/
 
-🎓 Student Endpoints
+# Student Endpoints
+
 GET /Users/student/dashboard/
 
 GET /Users/student/books/
@@ -166,7 +171,8 @@ POST /Users/student/return-request/
 
 POST /Users/student/books/borrow/<book_id>/
 
- Librarian Endpoints
+# Librarian Endpoints
+
 GET /Users/librarians/
 
 POST /Users/librarians/
@@ -177,7 +183,8 @@ PUT /Users/librarians/<id>/
 
 DELETE /Users/librarians/<id>/
 
- Librarian Book Management (Web Views)
+# Librarian Book Management (Web Views)
+
 GET /Users/librarian/books/
 
 GET /Users/librarian/books/add/
@@ -190,7 +197,8 @@ POST /Users/librarian/books/<id>/update/
 
 POST /Users/librarian/books/<id>/delete/
 
- Admin & Librarian Features
+# Admin & Librarian Features
+
 GET /Users/librarian/students/
 
 POST /Users/librarian/students/toggle-status/
@@ -213,7 +221,8 @@ POST /Users/librarian/return-requests/approve/<id>/
 
 POST /Users/librarian/return-requests/reject/<id>/
 
- Auth & Registration
+# Auth & Registration
+
 GET /Users/login/
 
 POST /Users/login/
@@ -225,4 +234,3 @@ GET /Users/register/
 GET|POST /Users/register/student/
 
 GET|POST /Users/register/librarian/
-
